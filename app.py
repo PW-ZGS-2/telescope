@@ -2,6 +2,7 @@ import asyncio
 from config import Config
 from livekit_publisher import LiveKitPublisher, Resolution
 from telescope_mock import TelescopeMock
+from telescope_assistant import TelescopeAssistant
 from livekit import api
 from load_env import load_env
 
@@ -27,7 +28,8 @@ class Application:
         self.publisher = LiveKitPublisher(
             self.loop, self.config["LIVEKIT_URL"], self.config["TOKEN"])
         self.telescope = TelescopeMock(self.config)
-        
+        self.telescope_assitant = TelescopeAssistant(self.telescope)
+
     def run(self):
         if self.loop.run_until_complete(self.publisher.connect()):
             print("connected to livekit")
@@ -44,10 +46,8 @@ class Application:
         while True:
             start_time = asyncio.get_event_loop().time()
 
-            frame = self.telescope.get_frame()
+            frame = self.telescope_assitant.get_frame()
             self.publisher.feed_frame(frame)
-
-            self.telescope.move(0.0, 0.0, 0.001)
 
             code_duration = asyncio.get_event_loop().time() - start_time
             await asyncio.sleep(period - code_duration)

@@ -1,11 +1,12 @@
+from telescope import Telescope
+
 import numpy as np
-from livekit import rtc
 import math
 import cv2
 from noise_generator import NoiseGenerator
 from celestial_data_loader import CelestialDataLoader
 
-class TelescopeMock:
+class TelescopeMock(Telescope):
     def __init__(self, config):
         self.SKY_COLOR = (25, 25, 112)
         self.LAND_COLOR = (0, 100, 0)
@@ -34,12 +35,21 @@ class TelescopeMock:
     def get_resolution(self):
         return (self.stream_width, self.stream_height)
     
+    def get_fov(self):
+        return (self.fovx, self.fovy)
+    
+    def get_orientation(self):
+        return (self.azimuth, self.elevation)
+    
+    def get_location(self):
+        return (self.latitute, self.longitude)
+    
     def set_orientation(self, azimuth, elevation):
         self.azimuth = azimuth
         self.elevation = elevation
         self.frame = self.draw()
 
-    def get_frame(self) -> rtc.VideoFrame:
+    def get_frame(self):
         return self.frame
     
     def set_zoom(self, zoom):
@@ -114,7 +124,4 @@ class TelescopeMock:
         self.canvas = self.empty_sky.copy()
         self.draw_celestial()
         self.draw_terrain()
-        argb_frame = cv2.cvtColor(self.canvas, cv2.COLOR_BGR2BGRA)
-        argb_frame[:, :, 3] = 255
-        argb_frame = argb_frame.tobytes()
-        return rtc.VideoFrame(self.stream_width, self.stream_height, rtc.VideoBufferType.RGBA, argb_frame)
+        return self.canvas.copy()
