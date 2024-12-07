@@ -1,6 +1,7 @@
 import asyncio
 import numpy as np
 from livekit import api, rtc
+import time
 
 class Resolution:
     def __init__(self, width, height):
@@ -30,13 +31,14 @@ class LiveKitPublisher:
         track = rtc.LocalVideoTrack.create_video_track("telescope", self.source)
         options = rtc.TrackPublishOptions()
         options.source = rtc.TrackSource.SOURCE_CAMERA
+        options.video_codec = rtc.VideoCodec.VP8
         publication = await self.room.local_participant.publish_track(track, options)
         print("published track %s", publication.sid)
 
     def feed_frame(self, frame: rtc.VideoFrame):
         if self.source is None:
             return
-        self.source.capture_frame(frame)
+        self.source.capture_frame(frame, timestamp_us=time.time_ns() // 1000)
         
     async def close(self):
         await self.room.disconnect()

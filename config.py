@@ -17,8 +17,8 @@ class Config(dict):
         default_config = {
             "LIVEKIT_URL": "http://localhost:7880",
             "TOKEN": "",
-            "STREAM_WIDTH": 640,
-            "STREAM_HEIGHT": 480,
+            "TELESCOPE_STREAM_WIDTH": 640,
+            "TELESCOPE_STREAM_HEIGHT": 480,
             "FRAME_PERIOD": 0.2
         }
         return default_config

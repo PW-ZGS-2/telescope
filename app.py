@@ -34,8 +34,10 @@ class Application:
         else:
             print("failed to connect to livekit")
             return
+        resolution = self.telescope.get_resolution()
         self.loop.run_until_complete(self.publisher.start_streaming(
-            Resolution(self.config["STREAM_WIDTH"], self.config["STREAM_HEIGHT"])))
+            Resolution(resolution[0], resolution[1])))
+        
         self.loop.run_until_complete(self.process_frame(self.config["FRAME_PERIOD"]))
 
     async def process_frame(self, period):
@@ -44,6 +46,8 @@ class Application:
 
             frame = self.telescope.get_frame()
             self.publisher.feed_frame(frame)
+
+            self.telescope.move(0.0, 0.0, 0.001)
 
             code_duration = asyncio.get_event_loop().time() - start_time
             await asyncio.sleep(period - code_duration)
