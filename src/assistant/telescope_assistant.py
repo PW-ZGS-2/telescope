@@ -1,11 +1,11 @@
-from telescope import Telescope
+from ..telescopes.telescope import Telescope
 
 import numpy as np
 import math
 import cv2
 from livekit import rtc
-from noise_generator import NoiseGenerator
-from celestial_data_loader import CelestialDataLoader
+from src.utils.noise_generator import NoiseGenerator
+from src.utils.celestial_data_loader import CelestialDataLoader
 
 
 class TelescopeAssistant():

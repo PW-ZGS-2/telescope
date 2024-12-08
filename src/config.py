@@ -15,12 +15,14 @@ class Config(dict):
 
     def create_default_config(self):
         default_config = {
+            "SERVER_URL": "http://localhost:8000",
             "LIVEKIT_URL": "ws://localhost:7880",
-            "TOKEN": "",
+            "TELESCOPE_NAME": "Teleskop Maciuś",
             "FRAME_PERIOD": 0.01,
             "LATITUDE": 50.0000,
             "LONGITUDE": 20.0000,
             "MAX_ZOOM": 5,
+            "PRICE_PER_MINUTE": 1.0,
             "TELESCOPE_FOVX": 1.6,
             "TELESCOPE_FOVY": 0.9,
             "TELESCOPE_STREAM_WIDTH": 1920,

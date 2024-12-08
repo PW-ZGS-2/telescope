@@ -1,10 +1,10 @@
-from telescope import Telescope
+from src.telescopes.telescope import Telescope
 
 import numpy as np
 import math
 import cv2
-from noise_generator import NoiseGenerator
-from celestial_data_loader import CelestialDataLoader
+from src.utils.noise_generator import NoiseGenerator
+from src.utils.celestial_data_loader import CelestialDataLoader
 
 class TelescopeMock(Telescope):
     def __init__(self, config):
