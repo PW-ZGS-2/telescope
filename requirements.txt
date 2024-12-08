@@ -3,3 +3,4 @@ livekit-api
 numpy
 opencv-python
 paho-mqtt
+matplotlib

@@ -29,7 +29,7 @@ class Application:
         self.mqtt.add_subscriber(self)
         self.mqtt.connect()
         self.mqtt.subscribe(f"{tid}/#")
-        LiveKitPublisher(
+        self.publisher = LiveKitPublisher(
             self.loop, self.config["LIVEKIT_URL"], token)
         if self.loop.run_until_complete(self.publisher.connect()):
             print("connected to livekit")
@@ -95,6 +95,12 @@ class Application:
             case _:
                 return
         self.telescope.move(da, de, dz)
+
+    def mqtt_command_spot(self, payload):
+        if not "interesting" in payload:
+            return
+        interesting = payload["interesting"]
+        self.telescope_assitant.set_interesting(interesting)
     
     def on_message(self, client, userdata, msg):
         topic = msg.topic.split('/')
@@ -106,5 +112,10 @@ class Application:
             payload = json.loads(msg.payload)
         except json.JSONDecodeError:
             return
-        if command == "move":
-            self.mqtt_command_move(payload)
+        match command: 
+            case "move":
+                self.mqtt_command_move(payload)
+            case "spot":
+                self.mqtt_command_spot(payload)
+            case _:
+                return

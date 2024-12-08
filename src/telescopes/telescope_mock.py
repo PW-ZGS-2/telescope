@@ -5,13 +5,16 @@ import math
 import cv2
 from src.utils.noise_generator import NoiseGenerator
 from src.utils.celestial_data_loader import CelestialDataLoader
+from src.utils.resource_loader import ResourceLoader
 
 class TelescopeMock(Telescope):
     def __init__(self, config):
         self.SKY_COLOR = (25, 25, 112)
         self.LAND_COLOR = (0, 100, 0)
         self.STAR_COLOR = (255, 255, 224)
-        self.STAR_SIZE = 10
+        self.STAR_SIZE = 30
+
+        self.resource_loader = ResourceLoader(2*self.STAR_SIZE)
 
         self.stream_width = config["TELESCOPE_STREAM_WIDTH"]
         self.stream_height = config["TELESCOPE_STREAM_HEIGHT"]
@@ -92,18 +95,40 @@ class TelescopeMock(Telescope):
         if diff < -math.pi:
             diff += 2 * math.pi
         return diff
+    
+    def draw_transparent_object(self, x, y, image):
+        if image is None or image.shape[-1] != 4:
+            return
+            
+        size = image.shape[0]
+        half_size = size // 2
+
+        y_min = y - half_size
+        y_max = y + half_size
+        x_min = x - half_size
+        x_max = x + half_size
+
+        canvas_h, canvas_w = self.canvas.shape[:2]
+        if y_min < 0 or y_max > canvas_h or x_min < 0 or x_max > canvas_w:
+            return
+
+        alpha = image[:, :, 3] / 255.0
+        for c in range(3):
+            self.canvas[y_min:y_max, x_min:x_max, c] = (
+                alpha * image[:, :, c] + (1 - alpha) * self.canvas[y_min:y_max, x_min:x_max, c]
+            )
 
     def draw_star(self, x, y):
-        size = self.STAR_SIZE
-        self.canvas[y - size:y + size, x - size:x + size] = self.STAR_COLOR
-
+        star = self.resource_loader.get_image("star")
+        self.draw_transparent_object(x, y, star)
+            
     def draw_moon(self, x, y):
-        size = self.STAR_SIZE * 10
-        cv2.circle(self.canvas, (x, y), size, (255, 255, 200), -1)
+        moon = self.resource_loader.get_image("moon")
+        self.draw_transparent_object(x, y, moon)
 
     def draw_planet(self, x, y):
-        size = self.STAR_SIZE * 3
-        cv2.circle(self.canvas, (x, y), size, (255, 255, 150), -1)
+        planet = self.resource_loader.get_image("planet")
+        self.draw_transparent_object(x, y, planet)
 
     def draw_celestial(self):
         for celestial in self.celestials:
@@ -125,3 +150,4 @@ class TelescopeMock(Telescope):
         self.draw_celestial()
         self.draw_terrain()
         return self.canvas.copy()
+    
