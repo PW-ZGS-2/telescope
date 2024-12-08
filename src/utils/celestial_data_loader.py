@@ -54,7 +54,7 @@ class CelestialDataLoader:
                 zn = almanac.get("zn", None)
                 if not dec or not gha or not hc or not zn:
                     continue
-                celestial_data.append(CelestialData(object_name, 
+                celestial_data.append(CelestialData(object_name.lower(), 
                     self.deg2rad(dec), 
                     self.deg2rad(gha),
                     self.deg2rad(hc), 

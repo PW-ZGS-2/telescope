@@ -36,7 +36,7 @@ class TelescopeAssistant():
         canvas = self.telescope.get_frame()
 
         for celestial in self.celestials:
-            if not celestial.object_name in self.interesting:
+            if len(self.interesting) > 0 and not celestial.object_name in self.interesting:
                 continue
             relative_azimuth = self.circular_diff(orientation[0], celestial.gha)
             relative_elevation = celestial.hc - orientation[1]
