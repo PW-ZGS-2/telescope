@@ -80,13 +80,13 @@ class TelescopeMock(Telescope):
         return canvas
     
     def draw_terrain(self):
-        if self.elevation > self.fovy / 2:
-            return
         land_height = self.stream_height * (1 - (2 * self.elevation / self.fovy))
         amplitude = self.stream_width / 20
         for w in range(self.stream_width):
             az = self.azimuth + w * self.fovx / self.stream_width
-            self.canvas[int(land_height + amplitude * math.sin(2 * az)):, w] = self.LAND_COLOR
+            land_first_pixel = int(land_height + amplitude * math.sin(2 * az))
+            if land_first_pixel < self.stream_height:
+                self.canvas[land_first_pixel:, w] = self.LAND_COLOR
 
     def circular_diff(self, base_angle, target_angle):
         diff = target_angle - base_angle

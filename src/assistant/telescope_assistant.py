@@ -19,7 +19,7 @@ class TelescopeAssistant():
         self.interesting = interesting
 
     def spot_celestial(self,canvas, x, y):
-        cv2.circle(canvas, (x, y), 100, (0, 255, 0), 100)
+        cv2.circle(canvas, (x, y), 80, (0, 255, 0), 10)
 
     def circular_diff(self, base_angle, target_angle):
         diff = target_angle - base_angle

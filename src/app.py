@@ -5,7 +5,7 @@ from src.utils.livekit_publisher import LiveKitPublisher, Resolution
 from src.telescopes.telescope_mock import TelescopeMock
 from src.assistant.telescope_assistant import TelescopeAssistant
 from livekit import api
-from src.utils.api import ApiClient, Location, Specifications, TelescopeData
+from src.utils.api import ApiClient, Location, Specifications, TelescopeData, TelescopeResponse
 from src.utils.mqtt_client import MQTTClient
 
 class Application:
@@ -74,7 +74,7 @@ class Application:
             status="FREE"
         )
         response = self.api.post_telescope(telescope_data)
-        if not "error" in response:
+        if type(response) is TelescopeResponse:
             return response.telescope_id, response.publish_token
         else:
             return None, None
