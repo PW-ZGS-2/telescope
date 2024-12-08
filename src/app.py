@@ -101,6 +101,7 @@ class Application:
             return
         interesting = payload["interesting"]
         self.telescope_assitant.set_interesting(interesting)
+        self.telescope.move(0, 0, 0)
     
     def on_message(self, client, userdata, msg):
         topic = msg.topic.split('/')

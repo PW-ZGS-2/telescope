@@ -52,8 +52,8 @@ class TelescopeAssistant():
                 deg += 360
             return deg
 
-        azimuth_text = f"AZIMUT: {rad2deg(orientation[0]):.2f}"
-        elevation_text = f"ELEVATION: {rad2deg(orientation[1]):.2f}"
+        azimuth_text = f"AZIMUT: {rad2deg(orientation[0]):.1f}°"
+        elevation_text = f"ELEVATION: {rad2deg(orientation[1]):.1f}°"
         font = cv2.FONT_HERSHEY_SIMPLEX
         font_scale = 1
         color = (255, 255, 255)
