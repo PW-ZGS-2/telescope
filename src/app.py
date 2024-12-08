@@ -1,10 +1,12 @@
 import asyncio
+import json
 from src.config import Config
 from src.utils.livekit_publisher import LiveKitPublisher, Resolution
 from src.telescopes.telescope_mock import TelescopeMock
 from src.assistant.telescope_assistant import TelescopeAssistant
 from livekit import api
 from src.utils.api import ApiClient, Location, Specifications, TelescopeData
+from src.utils.mqtt_client import MQTTClient
 
 class Application:
     def __init__(self):
@@ -12,15 +14,21 @@ class Application:
         self.loop = asyncio.new_event_loop()
         self.api = ApiClient(self.config["SERVER_URL"])
         self.publisher = None
+        self.tid = None
         self.telescope = TelescopeMock(self.config)
         self.telescope_assitant = TelescopeAssistant(self.telescope)
+        self.mqtt = MQTTClient(self.config["MQTT_URL"], self.config["MQTT_PORT"], self.config["MQTT_USER"], self.config["MQTT_PASSWORD"])
 
     def run(self):
-        token = self.announce_telescope()
-        if token is None:
+        tid, token = self.announce_telescope()
+        if tid is None or token is None:
             print("failed to announce telescope")
             return
-        print("got token")
+        self.tid = tid
+        print("got connection to server, tid: ", tid)
+        self.mqtt.add_subscriber(self)
+        self.mqtt.connect()
+        self.mqtt.subscribe(f"{tid}/#")
         LiveKitPublisher(
             self.loop, self.config["LIVEKIT_URL"], token)
         if self.loop.run_until_complete(self.publisher.connect()):
@@ -67,6 +75,36 @@ class Application:
         )
         response = self.api.post_telescope(telescope_data)
         if not "error" in response:
-            return response.publish_token
+            return response.telescope_id, response.publish_token
         else:
-            return None
+            return None, None
+        
+    def mqtt_command_move(self, payload):
+        if "type" not in payload or "value" not in payload:
+            return
+        da = 0.0
+        de = 0.0
+        dz = 0.0
+        match payload["type"]:
+            case "DX":
+                da = payload["value"]
+            case "DY":
+                de = payload["value"]
+            case "ZOOM":
+                dz = payload["value"]
+            case _:
+                return
+        self.telescope.move(da, de, dz)
+    
+    def on_message(self, client, userdata, msg):
+        topic = msg.topic.split('/')
+
+        if len(topic) != 2 or topic[0] != self.tid:
+            return
+        command = topic[1]
+        try:
+            payload = json.loads(msg.payload)
+        except json.JSONDecodeError:
+            return
+        if command == "move":
+            self.mqtt_command_move(payload)
