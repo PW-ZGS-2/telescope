@@ -19,7 +19,7 @@ class Config(dict):
             "LIVEKIT_URL": "ws://localhost:7880",
             "MQTT_URL": "mqtt://localhost",
             "MQTT_PORT": 1883,
-            "MQTT_USERNAME": "mqtt",
+            "MQTT_USER": "mqtt",
             "MQTT_PASSWORD": "",
             "TELESCOPE_NAME": "Teleskop Maciuś",
             "FRAME_PERIOD": 0.01,
